@@ -1,0 +1,30 @@
+[
+  {
+	"name": "webhook",
+	"label": "Webhook URL",
+	"type": "String",
+	"required": true
+  },
+  {
+	"name": "channel",
+	"label": "Slack Channel",
+	"type": "String",
+	"required": true
+  },
+  {
+	"name": "username",
+	"label": "Slack Username",
+	"type": "String",
+	"required": true
+  },
+  {
+	"name": "proxy",
+	"label": "HTTP Proxy",
+	"type": "String",
+	"required": false
+  }
+]
+
+
+
+
