@@ -47,7 +47,7 @@ describe('Exception Handler', function () {
 
 	describe('#error', function (done) {
 		it('should process the error data', function () {
-			var sampleError = new Error('This is a sample error.');
+			var sampleError = new Error('Slack Exception Handler Plugin Test Error.');
 
 			exceptionHandler.send({
 				type: 'error',
