@@ -1,51 +1,39 @@
 'use strict';
 
-var platform    = require('./platform'),
-	slack       = require('node-slack'),
-	slackClient, channel, username;
+var _           = require('lodash'),
+	platform    = require('./platform'),
+	Slack       = require('node-slack'),
+	slackConfig = {},
+	slackClient;
+
+/*
+ * Listen for the error event.
+ */
+platform.on('error', function (error) {
+	var notification = _.clone(slackConfig);
+
+	_.extend(notification, {
+		text: error.stack
+	});
+
+	slackClient.send(notification, function (error) {
+		if (!error) return;
+
+		console.error('Error on Slack.', error);
+		platform.handleException(error);
+	});
+});
 
 /*
  * Listen for the ready event.
  */
 platform.once('ready', function (options) {
+	_.extend(slackConfig, {
+		channel: _.startsWith(options.channel, '#') ? options.channel : '#' + options.channel,
+		username: options.username
+	});
 
-	channel  = options.channel;
-	username = options.username;
+	slackClient = new Slack(options.webhook);
 
-	if (!options.proxy)
-		slackClient = new slack(options.webhook);
-	else
-		slackClient = new slack(options.webhook, {proxy: options.proxy});
-
-	platform.log('Connected to Slack.');
-	platform.notifyReady(); // Need to notify parent process that initialization of this plugin is done.
-});
-
-/*
- * Listen for the data event.
- */
-platform.on('data', function (data) {
-
-	var slackObj = {};
-
-	//test if data is object and there is a text message
-	if (typeof data === 'object' && data.text) {
-		slackObj = data;
-		if (!slackObj.channel)
-			slackObj.channel = channel;
-
-		if (!slackObj.username)
-			slackObj.username = username;
-	} else {
-		slackObj.text = data;
-		slackObj.channel = channel;
-		slackObj.username = username;
-	}
-
-	//slack will validate the data and return any relevant error or missing fields
-	slackClient.send(slackObj, function(error) {
-		console.error('Error on Slack.', error);
-		platform.handleException(error);
-	})
-
+	platform.notifyReady();
 });
