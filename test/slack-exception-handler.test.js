@@ -1,5 +1,8 @@
 'use strict';
 
+const WEBHOOK = 'https://hooks.slack.com/services/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',
+	  CHANNEL = 'test';
+
 var cp     = require('child_process'),
 	should = require('should'),
 	exceptionHandler;
@@ -35,8 +38,8 @@ describe('Exception Handler', function () {
 				type: 'ready',
 				data: {
 					options: {
-						webhook: 'https://hooks.slack.com/services/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',
-						channel: 'test'
+						webhook: WEBHOOK,
+						channel: CHANNEL
 					}
 				}
 			}, function (error) {
