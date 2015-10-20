@@ -2,7 +2,6 @@
 
 var _           = require('lodash'),
 	platform    = require('./platform'),
-	Slack       = require('node-slack'),
 	slackConfig = {},
 	slackClient;
 
@@ -28,6 +27,8 @@ platform.on('error', function (error) {
  * Listen for the ready event.
  */
 platform.once('ready', function (options) {
+	var Slack = require('node-slack');
+
 	_.extend(slackConfig, {
 		channel: _.startsWith(options.channel, '#') ? options.channel : '#' + options.channel,
 		username: options.username
@@ -35,5 +36,6 @@ platform.once('ready', function (options) {
 
 	slackClient = new Slack(options.webhook);
 
+	platform.log('Slack Exception Handler Initialized.');
 	platform.notifyReady();
 });
