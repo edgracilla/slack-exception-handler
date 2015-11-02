@@ -1,9 +1,9 @@
 {
   "webhook": {
-	"label": "Webhook URL",
+	"label": "Slack Webhook URL",
 	"type": "String",
 	"required": true,
-	"help": "Specify the Webhook URL to use."
+	"help": "Specify the Slack Webhook URL to use."
   },
   "channel": {
 	"label": "Slack Channel",
