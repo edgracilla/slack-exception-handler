@@ -1,7 +1,7 @@
 {
   "name": "slack-exception-handler",
   "description": "Slack Exception Handler Plugin for Reekoh IoT Platform. Post error notifications on Slack.",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "author": "Reekoh, Inc.",
   "main": "app.js",
   "scripts": {
