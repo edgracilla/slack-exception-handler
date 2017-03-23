@@ -1,48 +1,44 @@
-'use strict';
+'use strict'
 
-var _           = require('lodash'),
-	platform    = require('./platform'),
-	slackConfig = {},
-	slackClient;
+const reekoh = require('reekoh')
+const _ = require('lodash')
+const _plugin = new reekoh.plugins.ExceptionLogger()
 
-/*
- * Listen for the error event.
- */
-platform.on('error', function (error) {
-	var notification = _.clone(slackConfig);
+let slackConfig = {}
+let slackClient
 
-	_.extend(notification, {
-		text: error.stack
-	});
+_plugin.on('exception', (error) => {
+  let notification = _.clone(slackConfig)
 
-	slackClient.send(notification, function (error) {
-		if (!error) return;
+  _.extend(notification, {
+    text: error.stack
+  })
 
-		console.error('Error on Slack.', error);
-		platform.handleException(error);
-	});
-});
+  slackClient.send(notification, (error) => {
+    if (!error) return
 
-/*
- * Event to listen to in order to gracefully release all resources bound to this service.
- */
-platform.on('close', function () {
-	platform.notifyClose();
-});
+    console.error('Error on Slack.', error)
+    _plugin.logException(error)
+  })
 
-/*
- * Listen for the ready event.
- */
-platform.once('ready', function (options) {
-	var Slack = require('node-slack');
+  _plugin.log(JSON.stringify({
+    title: 'Exception sent to Slack',
+    data: {message: error.message, stack: error.stack, name: error.name}
+  }))
+})
 
-	_.extend(slackConfig, {
-		channel: _.startsWith(options.channel, '#') ? options.channel : '#' + options.channel,
-		username: options.username
-	});
+_plugin.once('ready', () => {
+  let Slack = require('node-slack')
 
-	slackClient = new Slack(options.webhook);
+  _.extend(slackConfig, {
+    channel: _.startsWith(_plugin.config.channel, '#') ? _plugin.config.channel : '#' + _plugin.config.channel,
+    username: _plugin.config.username
+  })
 
-	platform.log('Slack Exception Handler Initialized.');
-	platform.notifyReady();
-});
+  slackClient = new Slack(_plugin.config.webhook)
+
+  _plugin.log('Slack Exception Logger has been initialized.')
+  _plugin.emit('init')
+})
+
+module.exports = _plugin
