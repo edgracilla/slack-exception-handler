@@ -2,12 +2,12 @@
 
 const reekoh = require('reekoh')
 const _ = require('lodash')
-const _plugin = new reekoh.plugins.ExceptionLogger()
+const plugin = new reekoh.plugins.ExceptionLogger()
 
 let slackConfig = {}
 let slackClient
 
-_plugin.on('exception', (error) => {
+plugin.on('exception', (error) => {
   let notification = _.clone(slackConfig)
 
   _.extend(notification, {
@@ -18,27 +18,27 @@ _plugin.on('exception', (error) => {
     if (!error) return
 
     console.error('Error on Slack.', error)
-    _plugin.logException(error)
+    plugin.logException(error)
   })
 
-  _plugin.log(JSON.stringify({
+  plugin.log(JSON.stringify({
     title: 'Exception sent to Slack',
     data: {message: error.message, stack: error.stack, name: error.name}
   }))
 })
 
-_plugin.once('ready', () => {
+plugin.once('ready', () => {
   let Slack = require('node-slack')
 
   _.extend(slackConfig, {
-    channel: _.startsWith(_plugin.config.channel, '#') ? _plugin.config.channel : '#' + _plugin.config.channel,
-    username: _plugin.config.username
+    channel: _.startsWith(plugin.config.channel, '#') ? plugin.config.channel : '#' + plugin.config.channel,
+    username: plugin.config.username
   })
 
-  slackClient = new Slack(_plugin.config.webhook)
+  slackClient = new Slack(plugin.config.webhook)
 
-  _plugin.log('Slack Exception Logger has been initialized.')
-  _plugin.emit('init')
+  plugin.log('Slack Exception Logger has been initialized.')
+  plugin.emit('init')
 })
 
-module.exports = _plugin
+module.exports = plugin
